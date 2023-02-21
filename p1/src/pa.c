@@ -21,7 +21,7 @@ int main(int argc, char const *argv[])
 
     if (argc != 3)
     {
-        fprintf(stderr, "Usage: <file_name> <size of buffer> <path_to_create_directories>\n");
+        fprintf(stderr, "[PA] Usage: <file_name> <size of buffer> <path_to_create_directories>\n");
         exit(EXIT_FAILURE);
     }
 

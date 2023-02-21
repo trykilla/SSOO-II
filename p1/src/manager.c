@@ -1,3 +1,13 @@
+/************************************************************************************
+ * Project: Practise 1 - Operating Systems                                          *                    
+ * Program name: manager.c                                                          *                                 
+ * Author: Héctor Alberca Sánchez-Quintanar                                         *
+ * Date: 20/02/2023                                                                 *
+ * Purpose: Process managing                                                        *
+ * Revision history: Héctor Alberca Sánchez-Quintanar, 20/02/2023                   *
+ * Create of process A and B                                                        *
+ ************************************************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,6 +23,7 @@
 void signal_handler(int sig);
 void end_process(void);
 
+
 #define CHILD_NUM 4
 
 pid_t pids[CHILD_NUM];
@@ -23,37 +34,45 @@ int main(int argc, char *argv[])
 
     if (signal(SIGUSR1, signal_handler) == SIG_ERR)
     {
-        fprintf(stderr, "Error setting signal handler");
+        fprintf(stderr, "[MANAGER] Error setting signal handler");
         exit(EXIT_FAILURE);
     }
 
     switch (pids[0] = fork())
     {
     case -1:
-        fprintf(stderr, "Error creating child process");
+        fprintf(stderr, "[MANAGER] Error creating child process");
         end_process();
         break;
 
     case 0:
         char *args[] = {argv[1], argv[2], argv[3], NULL};
-        printf("Hello");
+
         execv("exec/pa", args);
         break;
     }
 
-    pid = waitpid(pids[0], NULL, NULL);
+    if ((pid = wait(NULL)) == -1)
+    {
+        fprintf(stderr, "[MANAGER] Error waiting for child process\n");
+        end_process();
+    }
+
+    if (pid == pids[0])
+    {
+        printf("[MANAGER] Child process %d finished\n", pid);
+    }
+
+
 
     return EXIT_SUCCESS;
 }
-
-
-
 
 void signal_handler(int sig)
 {
     if (sig == SIGUSR1)
     {
-        printf("Child proccess finished, the execution continues...\n");
+        printf("[MANAGER] Child proccess finished, the execution continues...\n");
         sleep(1);
     }
 }
@@ -67,7 +86,7 @@ void end_process(void)
         {
             if (kill(pids[i], SIGUSR1) == -1)
             {
-                fprintf(stderr, "Error killing child process\n");
+                fprintf(stderr, "[MANAGER] Error killing child process\n");
             }
         }
     }
