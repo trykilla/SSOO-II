@@ -7,7 +7,7 @@ CFLAGS := -I$(DIRHEA) -c -Wall
 LDLIBS := -lpthread -lrt
 CC := gcc
 
-all : dirs manager pa
+all : dirs manager pa pb
 
 clean_students: #borrar la carpeta de los estudiantes
 	find students/ -mindepth 1 ! -name 'Students.txt' -delete
@@ -19,6 +19,9 @@ manager: $(DIROBJ)manager.o
 	$(CC) -o $(DIREXE)$@ $^ $(LDLIBS)
 
 pa: $(DIROBJ)pa.o 
+	$(CC) -o $(DIREXE)$@ $^ $(LDLIBS)
+
+pb: $(DIROBJ)pb.o 
 	$(CC) -o $(DIREXE)$@ $^ $(LDLIBS)
 
 $(DIROBJ)%.o: $(DIRSRC)%.c
