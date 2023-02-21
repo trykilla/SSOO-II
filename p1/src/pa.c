@@ -19,15 +19,21 @@ int main(int argc, char const *argv[])
 
     char path[MAX_SIZE];
 
+    parse_args(argc);
+    strcpy(path, argv[2]);
+    printf("path: %s", path);
+    readFile(argv[0], atoi(argv[1]), path);
+
+    kill(getppid(), SIGUSR1);
+
+    return EXIT_SUCCESS;
+}
+
+void parse_args(int argc)
+{
     if (argc != 3)
     {
         fprintf(stderr, "[PA] Usage: <file_name> <size of buffer> <path_to_create_directories>\n");
         exit(EXIT_FAILURE);
     }
-
-    strcpy(path, argv[2]);
-    readFile(argv[0], atoi(argv[1]), path);
-    kill(getppid(), SIGUSR1);
-
-    return EXIT_SUCCESS;
 }

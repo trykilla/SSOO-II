@@ -1,6 +1,6 @@
 /************************************************************************************
- * Project: Practise 1 - Operating Systems                                          *                    
- * Program name: manager.c                                                          *                                 
+ * Project: Practise 1 - Operating Systems                                          *
+ * Program name: manager.c                                                          *
  * Author: Héctor Alberca Sánchez-Quintanar                                         *
  * Date: 20/02/2023                                                                 *
  * Purpose: Process managing                                                        *
@@ -22,50 +22,61 @@
 
 void signal_handler(int sig);
 void end_process(void);
-
-
+void create_process(char path[], char *arg[]);
+void install_signal(void);
+void parse_args(int argc);
 #define CHILD_NUM 4
 
 pid_t pids[CHILD_NUM];
 
 int main(int argc, char *argv[])
 {
-    pid_t pid;
+    char *args[] = {argv[1], argv[2], argv[3], NULL};
 
+    install_signal();
+    create_process("./exec/pa", args);
+
+    waitpid(pids[0], NULL, 0);
+    
+
+    return EXIT_SUCCESS;
+}
+
+void create_process(char path[], char *arg[])
+{
+    pid_t pid;
+    switch (pid = fork())
+    {
+    case -1:
+        fprintf(stderr, "[MANAGER] Error executing fork()\n");
+        end_process();
+        break;
+
+    case 0:
+        printf("%s, %s %s %s \n", path, arg[0], arg[1], arg[2]);
+
+        printf("path: %s", path);
+        if (execv(path, arg) == -1)
+        {
+            fprintf(stderr, "[MANAGER] Error executing execl\n");
+            exit(EXIT_FAILURE);
+        }
+    }
+}
+
+void install_signal()
+{
     if (signal(SIGUSR1, signal_handler) == SIG_ERR)
     {
         fprintf(stderr, "[MANAGER] Error setting signal handler");
         exit(EXIT_FAILURE);
     }
 
-    switch (pids[0] = fork())
+    if (signal(SIGINT, signal_handler) == SIG_ERR)
     {
-    case -1:
-        fprintf(stderr, "[MANAGER] Error creating child process");
-        end_process();
-        break;
-
-    case 0:
-        char *args[] = {argv[1], argv[2], argv[3], NULL};
-
-        execv("exec/pa", args);
-        break;
+        fprintf(stderr, "[MANAGER] Error setting signal handler");
+        exit(EXIT_FAILURE);
     }
-
-    if ((pid = wait(NULL)) == -1)
-    {
-        fprintf(stderr, "[MANAGER] Error waiting for child process\n");
-        end_process();
-    }
-
-    if (pid == pids[0])
-    {
-        printf("[MANAGER] Child process %d finished\n", pid);
-    }
-
-
-
-    return EXIT_SUCCESS;
 }
 
 void signal_handler(int sig)
@@ -74,6 +85,13 @@ void signal_handler(int sig)
     {
         printf("[MANAGER] Child proccess finished, the execution continues...\n");
         sleep(1);
+    }
+
+    if (sig == SIGINT)
+    {
+        printf("[MANAGER] SIGINT signal received (CTRL + C), the execution will be finished...\n");
+        end_process();
+        exit(EXIT_SUCCESS);
     }
 }
 
