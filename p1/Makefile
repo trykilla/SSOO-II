@@ -28,7 +28,7 @@ $(DIROBJ)%.o: $(DIRSRC)%.c
 	$(CC) $(CFLAGS) $^ -o $@
 
 test:
-	./$(DIREXE)manager students/Students.txt 100 students/
+	./$(DIREXE)manager students/Students.txt 1000 students/
 
 solution:
 	./$(DIREXE)manager 2 3 4

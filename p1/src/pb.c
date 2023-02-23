@@ -17,12 +17,11 @@ int main(int argc, char const *argv[])
 {
     char path[MAX_SIZE];
 
-    parse_args(argc);
-    strcpy(path, argv[2]);
-
-    printf("[PB] Reading file...\n");
-    readFile(argv[0], atoi(argv[1]), path,1);
+    // parse_args(argc);
+    strcpy(path, argv[3]);
+   
+    readFile(argv[1], atoi(argv[2]), path,1);
     printf("[PB] Finished reading file.\n");
-    kill(getppid(), SIGUSR2);
+    // kill(getppid(), SIGUSR2);
     return 0;
 }

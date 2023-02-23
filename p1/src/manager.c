@@ -38,9 +38,9 @@ int main(int argc, char *argv[])
 
     waitpid(pids[0], NULL, 0);
 
-    pids[1] = create_process("exec/pb", args);
+    // pids[1] = create_process("exec/pb", args);
 
-    waitpid(pids[1], NULL, 0);
+    // waitpid(pids[1], NULL, 0);
 
     printf("[MANAGER] All child processes finished, the execution will be finished...\n");
     
