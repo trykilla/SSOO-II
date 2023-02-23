@@ -23,10 +23,6 @@ int main(int argc, char const *argv[])
     strcpy(path, argv[2]);
 
     readFile(argv[0], atoi(argv[1]), path, 0);
-    
-
-    // kill(getppid(), SIGUSR1);
-    
 
     return EXIT_SUCCESS;
 }

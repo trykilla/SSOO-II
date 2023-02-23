@@ -8,20 +8,19 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <time.h>
-#include <signal.h>
 #include "../include/my_lib.h"
 
-#define MAX_SIZE 100
+#define MAX_SIZE 4096
+
+
 
 int main(int argc, char const *argv[])
 {
     char path[MAX_SIZE];
-
     parse_args(argc);
     strcpy(path, argv[2]);
-   
-    readFile(argv[0], atoi(argv[1]), path,1);
-    
-    // kill(getppid(), SIGUSR2);
+
+    readFile(argv[0], atoi(argv[1]), path, 2);
+
     return 0;
 }

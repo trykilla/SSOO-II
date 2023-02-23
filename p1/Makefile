@@ -7,7 +7,7 @@ CFLAGS := -I$(DIRHEA) -c -Wall
 LDLIBS := -lpthread -lrt
 CC := gcc
 
-all : dirs manager pa pb
+all : dirs manager pa pb pc 
 
 clean_students: #borrar la carpeta de los estudiantes
 	find students/ -mindepth 1 ! -name 'Students.txt' -delete
@@ -24,6 +24,9 @@ pa: $(DIROBJ)pa.o
 pb: $(DIROBJ)pb.o 
 	$(CC) -o $(DIREXE)$@ $^ $(LDLIBS)
 
+pc: $(DIROBJ)pc.o
+	$(CC) -o $(DIREXE)$@ $^ $(LDLIBS)
+
 $(DIROBJ)%.o: $(DIRSRC)%.c
 	$(CC) $(CFLAGS) $^ -o $@
 
@@ -34,4 +37,4 @@ solution:
 	./$(DIREXE)manager 2 3 4
 
 clean : 
-	rm -rf *~ core $(DIROBJ) $(DIREXE) $(DIRHEA)*~ $(DIRSRC)*~
+	rm -rf *~ core $(DIROBJ) $(DIREXE) 

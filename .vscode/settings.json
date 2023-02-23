@@ -2,6 +2,7 @@
     "files.associations": {
         "stdio.h": "c",
         "fcntl.h": "c",
-        "signal.h": "c"
+        "signal.h": "c",
+        "my_lib.h": "c"
     }
 }

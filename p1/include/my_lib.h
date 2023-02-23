@@ -12,6 +12,7 @@
 
 #define PATH_SIZE 40
 #define BUFFER_SIZE 4096
+#define MIN_GRADE 5
 
 void parse_args(int argc);
 void cp_file(int fd1, int fd2);
@@ -21,12 +22,16 @@ void open_files(int *fd1, int *fd2, char model_path[], char path[], char token[]
 void readFile(const char *filename, int size, char path[], int option)
 {
     FILE *fp;
-    int fd1, fd2;
-    char *exam_model;
-    char model_path[] = "examModels/";
-    char line[size];
+    FILE *f_mark;
 
+    int fd1, fd2;
+    int mark;
+
+    char *exam_model;
     char *token;
+
+    char line[size];
+    char model_path[] = "examModels/";
 
     fp = fopen(filename, "r");
     if (fp == NULL)
@@ -45,13 +50,13 @@ void readFile(const char *filename, int size, char path[], int option)
             strcpy(first_path, path);
             strcat(first_path, token);
             mkdir(first_path, 0777);
+            
 
             break;
 
         case 1:
             token = strtok(line, " ");
             exam_model = strtok(NULL, " ");
-            printf("Model: %s\n", exam_model);
 
             if (strcmp(exam_model, "A") == 0)
             {
@@ -59,23 +64,52 @@ void readFile(const char *filename, int size, char path[], int option)
                 open_files(&fd1, &fd2, model_path, path, token, complete_exam_model);
                 cp_file(fd1, fd2);
             }
-            else if (strcmp(exam_model, "B") == 0){
+            else if (strcmp(exam_model, "B") == 0)
+            {
                 char complete_exam_model[] = "/MODELOB.pdf";
                 open_files(&fd1, &fd2, model_path, path, token, complete_exam_model);
                 cp_file(fd1, fd2);
             }
-            else if (strcmp(exam_model, "C") == 0){
+            else if (strcmp(exam_model, "C") == 0)
+            {
                 char complete_exam_model[] = "/MODELOC.pdf";
                 open_files(&fd1, &fd2, model_path, path, token, complete_exam_model);
                 cp_file(fd1, fd2);
             }
 
             break;
+        case 2:
+
+            int needed_mark;
+
+            char msg[] = "Mark you should obtain in this new exam to pass is:";
+
+            token = strtok(line, " ");
+            exam_model = strtok(NULL, " ");
+            mark = atoi(strtok(NULL, " "));
+            needed_mark = 2 * MIN_GRADE - mark;
+
+            strcpy(first_path, path);
+            strcat(first_path, token);
+
+            strcat(first_path, "/needed_mark.txt");
+
+            if ((f_mark = fopen(first_path, "w+")) == NULL)
+            {
+                fprintf(stderr, "Error creating file.\n");
+                exit(EXIT_FAILURE);
+            }
+
+            fprintf(f_mark, "%s %d", msg, needed_mark);
+            break;
         }
     }
+
     fclose(fp);
     close(fd1);
     close(fd2);
+    fclose(f_mark);
+    
 }
 
 void open_files(int *fd1, int *fd2, char model_path[], char path[], char token[], char exam_model[])
