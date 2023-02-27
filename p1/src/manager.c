@@ -21,6 +21,7 @@
 #include <signal.h>
 
 #define CHILD_NUM 4
+#define MAX 100
 
 void signal_handler(int sig);
 void end_process(void);
@@ -32,7 +33,18 @@ pid_t g_pids[CHILD_NUM];
 
 int main(int argc, char *argv[])
 {
+    int fd1[2];
+    FILE *fp;
     char *args[] = {argv[1], argv[2], argv[3], NULL};
+
+    char buf[MAX];
+    char wr_fd[MAX];
+
+    pipe(fd1);
+
+    sprintf(wr_fd, "%d", fd1[1]);
+
+    char *pc_args[] = {argv[1], argv[2], argv[3], wr_fd, NULL};
 
     install_signal();
 
@@ -40,15 +52,28 @@ int main(int argc, char *argv[])
 
     waitpid(g_pids[0], NULL, 0);
 
-    printf("[MANAGER] Child process A finished, the execution continues...\n");
+    if ((fp = fopen("files/log.txt", "w+")) == NULL)
+    {
+        fprintf(stderr, "Error creating file.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    fprintf(fp, "******** System Log ********\nDirectory creation finished.\n");
+
+    // printf("[MANAGER] Child process A finished, the execution continues...\n");
     sleep(1);
 
     g_pids[1] = create_process("exec/pb", args);
-    g_pids[2] = create_process("exec/pc", args);
+    g_pids[2] = create_process("exec/pc", pc_args);
     waitpid(g_pids[1], NULL, 0);
+    fprintf(fp, "Exam models copy finished.\n");
+    printf("[MANAGER] Child process B finished, the execution continues...\n");
+    read(fd1[0], buf, MAX);
+    printf("%s", buf);
     waitpid(g_pids[2], NULL, 0);
+    fprintf(fp, "Files creation with mark necessary to reach media, finished.\n");
 
-    printf("[MANAGER] All child processes finished, the execution will be finished...\n");
+    // printf("[MANAGER] All child processes finished, the execution will be finished...\n");
 
     return EXIT_SUCCESS;
 }
@@ -91,11 +116,6 @@ void install_signal()
 
 void signal_handler(int sig)
 {
-    while (sig == SIGUSR1)
-    {
-        printf("[MANAGER] Child proccess finished, the execution continues...\n");
-        sleep(1);
-    }
 
     if (sig == SIGINT)
     {

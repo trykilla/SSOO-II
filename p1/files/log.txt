@@ -1,0 +1,3 @@
+******** System Log ********
+Directory creation finished.
+Exam models copy finished.

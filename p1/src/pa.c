@@ -22,7 +22,8 @@ int main(int argc, char const *argv[])
     parse_args(argc);
     strcpy(path, argv[2]);
 
-    readFile(argv[0], atoi(argv[1]), path, 0);
+    readFile(argv[0], atoi(argv[1]), path, 0, NULL);
+    printf("Hola\n");
 
     return EXIT_SUCCESS;
 }

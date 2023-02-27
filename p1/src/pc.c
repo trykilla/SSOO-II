@@ -17,10 +17,10 @@
 int main(int argc, char const *argv[])
 {
     char path[MAX_SIZE];
-    parse_args(argc);
+    // parse_args(argc);
     strcpy(path, argv[2]);
 
-    readFile(argv[0], atoi(argv[1]), path, 2);
+    readFile(argv[0], atoi(argv[1]), path, 2, argv[3]);
 
     return 0;
 }

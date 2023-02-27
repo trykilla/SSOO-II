@@ -19,13 +19,15 @@ void cp_file(int fd1, int fd2);
 void open_files(int *fd1, int *fd2, char model_path[], char path[], char token[], char exam_model[]);
 // void open_files(int fd1, int fd2, char model_path[], char path[], char token[], char complete_exam_model[]);
 
-void readFile(const char *filename, int size, char path[], int option)
+void readFile(const char *filename, int size, char path[], int option, char const *pipe_name[])
 {
     FILE *fp;
     FILE *f_mark;
 
     int fd1, fd2;
     int mark;
+    float class_media = 0;
+    float child_counter;
 
     char *exam_model;
     char *token;
@@ -50,8 +52,6 @@ void readFile(const char *filename, int size, char path[], int option)
             strcpy(first_path, path);
             strcat(first_path, token);
             mkdir(first_path, 0777);
-            
-
             break;
 
         case 1:
@@ -87,6 +87,9 @@ void readFile(const char *filename, int size, char path[], int option)
             token = strtok(line, " ");
             exam_model = strtok(NULL, " ");
             mark = atoi(strtok(NULL, " "));
+            class_media += mark;
+            
+            child_counter++;
             needed_mark = 2 * MIN_GRADE - mark;
 
             strcpy(first_path, path);
@@ -105,11 +108,20 @@ void readFile(const char *filename, int size, char path[], int option)
         }
     }
 
+    if (option == 2)
+    {
+        
+        class_media = class_media / child_counter;
+        printf("Class media: %f\n", class_media);
+        // gcvt(class_media, sizeof(class_media_char), class_media_char);
+        write(pipe_name, &class_media, sizeof(class_media));
+        
+    }
+
     fclose(fp);
     close(fd1);
     close(fd2);
     fclose(f_mark);
-    
 }
 
 void open_files(int *fd1, int *fd2, char model_path[], char path[], char token[], char exam_model[])

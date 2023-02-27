@@ -20,7 +20,7 @@ int main(int argc, char const *argv[])
     parse_args(argc);
     strcpy(path, argv[2]);
    
-    readFile(argv[0], atoi(argv[1]), path,1);
+    readFile(argv[0], atoi(argv[1]), path,1, NULL);
     
     // kill(getppid(), SIGUSR2);
     return 0;
