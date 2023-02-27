@@ -1,3 +1,6 @@
 ******** System Log ********
 Directory creation finished.
 Exam models copy finished.
+Files creation with mark necessary to reach media, finished.
+Media of the class: 6
+END OF PROGRAM

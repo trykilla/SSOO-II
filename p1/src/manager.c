@@ -35,9 +35,10 @@ int main(int argc, char *argv[])
 {
     int fd1[2];
     FILE *fp;
+    
     char *args[] = {argv[1], argv[2], argv[3], NULL};
 
-    char buf[MAX];
+    char buf[30];
     char wr_fd[MAX];
 
     pipe(fd1);
@@ -67,11 +68,16 @@ int main(int argc, char *argv[])
     g_pids[2] = create_process("exec/pc", pc_args);
     waitpid(g_pids[1], NULL, 0);
     fprintf(fp, "Exam models copy finished.\n");
+
     printf("[MANAGER] Child process B finished, the execution continues...\n");
-    read(fd1[0], buf, MAX);
-    printf("%s", buf);
+    //leeme de la tubería que le pasé al hijo:
+    read(fd1[0], buf, sizeof(buf));
+    
+
     waitpid(g_pids[2], NULL, 0);
     fprintf(fp, "Files creation with mark necessary to reach media, finished.\n");
+    fprintf(fp, "Media of the class: %s\nEND OF PROGRAM", buf);
+
 
     // printf("[MANAGER] All child processes finished, the execution will be finished...\n");
 
