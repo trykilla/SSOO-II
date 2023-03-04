@@ -19,6 +19,8 @@
 #include <fcntl.h>
 #include <time.h>
 #include <signal.h>
+#include <my_lib.h>
+#include <def.h>
 
 #define CHILD_NUM 4
 #define MAX 100
@@ -30,12 +32,13 @@ void install_signal(void);
 void parse_args(int argc);
 
 pid_t g_pids[CHILD_NUM];
+struct TProcess_t *g_process_table;
 
 int main(int argc, char *argv[])
 {
     int fd1[2];
     FILE *fp;
-    
+
     char *args[] = {argv[1], argv[2], argv[3], NULL};
 
     char buf[30];
@@ -52,13 +55,10 @@ int main(int argc, char *argv[])
     g_pids[0] = create_process("exec/pa", args);
 
     waitpid(g_pids[0], NULL, 0);
+    g_pids[0] = 0;
 
-    if ((fp = fopen("files/log.txt", "w+")) == NULL)
-    {
-        fprintf(stderr, "Error creating file.\n");
-        exit(EXIT_FAILURE);
-    }
-
+    fp = open_single_file("files/log.txt", 2);
+  
     fprintf(fp, "******** System Log ********\nDirectory creation finished.\n");
 
     // printf("[MANAGER] Child process A finished, the execution continues...\n");
@@ -66,18 +66,20 @@ int main(int argc, char *argv[])
 
     g_pids[1] = create_process("exec/pb", args);
     g_pids[2] = create_process("exec/pc", pc_args);
+    
     waitpid(g_pids[1], NULL, 0);
+    g_pids[1] = 0;
     fprintf(fp, "Exam models copy finished.\n");
 
-    printf("[MANAGER] Child process B finished, the execution continues...\n");
-    //leeme de la tubería que le pasé al hijo:
+    // leeme de la tubería que le pasé al hijo:
+    // vamos a cerrar la parte de la tubería que no vamos a usar
+    close(fd1[1]);
     read(fd1[0], buf, sizeof(buf));
-    
 
     waitpid(g_pids[2], NULL, 0);
+    g_pids[2] = 0;
     fprintf(fp, "Files creation with mark necessary to reach media, finished.\n");
     fprintf(fp, "Media of the class: %s\nEND OF PROGRAM", buf);
-
 
     // printf("[MANAGER] All child processes finished, the execution will be finished...\n");
 
@@ -107,11 +109,11 @@ pid_t create_process(char path[], char *arg[])
 
 void install_signal()
 {
-    if (signal(SIGUSR1, signal_handler) == SIG_ERR)
-    {
-        fprintf(stderr, "[MANAGER] Error setting signal handler");
-        exit(EXIT_FAILURE);
-    }
+    // if (signal(SIGUSR1, signal_handler) == SIG_ERR)
+    // {
+    //     fprintf(stderr, "[MANAGER] Error setting signal handler");
+    //     exit(EXIT_FAILURE);
+    // }
 
     if (signal(SIGINT, signal_handler) == SIG_ERR)
     {

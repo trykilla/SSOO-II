@@ -9,22 +9,35 @@
 #include <fcntl.h>
 #include <time.h>
 #include <signal.h>
-
-#include "../include/my_lib.h"
+#include <my_lib.h>
 
 #define MAX_SIZE 100
 
 int main(int argc, char const *argv[])
 {
 
+    FILE *fp;
     char path[MAX_SIZE];
+    char line[MAX_SIZE];
+
+    char *token;
 
     parse_args(argc);
     strcpy(path, argv[2]);
+    printf("%s", argv[0]);
 
-    readFile(argv[0], atoi(argv[1]), path, 0, NULL);
-    printf("Hola\n");
+    fp = open_single_file(argv[0],1);
 
+    
+    while (fgets(line, sizeof(line), fp))
+    {
+
+        token = strtok(line, " ");
+        char first_path[PATH_SIZE];
+        strcpy(first_path, path);
+        strcat(first_path, token);
+        mkdir(first_path, 0777);
+    }
+    fclose(fp);
     return EXIT_SUCCESS;
 }
-

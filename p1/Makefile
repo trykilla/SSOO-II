@@ -38,3 +38,5 @@ solution:
 
 clean : 
 	rm -rf *~ core $(DIROBJ) $(DIREXE) 
+
+clean_all: clean clean_students

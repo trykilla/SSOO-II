@@ -8,7 +8,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <time.h>
-#include "../include/my_lib.h"
+#include <my_lib.h>
 
 #define MAX_SIZE 4096
 
@@ -17,9 +17,10 @@ int main(int argc, char const *argv[])
     FILE *fp;
     FILE *f_mark;
     char path[MAX_SIZE];
-
     char *token;
+    
     int mark;
+    
     float class_media = 0;
     float child_counter = 0;
 
@@ -29,12 +30,7 @@ int main(int argc, char const *argv[])
     // readFile(argv[0], atoi(argv[1]), path, 2, argv[3]);
 
     char line[MAX_SIZE];
-    fp = fopen(argv[0], "r");
-    if (fp == NULL)
-    {
-        fprintf(stderr, "Error opening file.\n");
-        exit(EXIT_FAILURE);
-    }
+    fp  = open_single_file(argv[0],1);
 
     while (fgets(line, sizeof(line), fp))
     {
@@ -70,6 +66,6 @@ int main(int argc, char const *argv[])
     gcvt(class_media, sizeof(class_media_char), class_media_char);
     write(atoi(argv[3]), class_media_char, sizeof(class_media_char));
 
-    printf("Terminé\n");
+    fclose(fp);
     return 0;
 }

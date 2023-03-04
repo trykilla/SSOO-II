@@ -18,102 +18,33 @@ void parse_args(int argc);
 void cp_file(int fd1, int fd2);
 void open_files(int *fd1, int *fd2, char model_path[], char path[], char token[], char exam_model[]);
 // void open_files(int fd1, int fd2, char model_path[], char path[], char token[], char complete_exam_model[]);
+FILE *open_single_file(const char file_name[], int option);
 
-void readFile(const char *filename, int size, char path[], int option, char const pipe_name[])
+FILE *open_single_file(const char file_name[], int option)
 {
     FILE *fp;
-    FILE *f_mark;
 
-    int fd1, fd2;
-    int mark;
-    float class_media = 0;
-    float child_counter;
-
-    char *exam_model;
-    char *token;
-
-    char line[size];
-    char model_path[] = "examModels/";
-
-    fp = fopen(filename, "r");
-    if (fp == NULL)
+    switch (option)
     {
-        fprintf(stderr, "Error opening file.\n");
-        exit(EXIT_FAILURE);
-    }
-
-    while (fgets(line, sizeof(line), fp))
-    {
-        switch (option)
+    case 1:
+        fp = fopen(file_name, "r");
+        if (fp == NULL)
         {
-        case 0:
-            token = strtok(line, " ");
-            char first_path[PATH_SIZE];
-            strcpy(first_path, path);
-            strcat(first_path, token);
-            mkdir(first_path, 0777);
-            break;
-
-        case 1:
-            token = strtok(line, " ");
-            exam_model = strtok(NULL, " ");
-
-            if (strcmp(exam_model, "A") == 0)
-            {
-                char complete_exam_model[] = "/MODELOA.pdf";
-                open_files(&fd1, &fd2, model_path, path, token, complete_exam_model);
-                cp_file(fd1, fd2);
-            }
-            else if (strcmp(exam_model, "B") == 0)
-            {
-                char complete_exam_model[] = "/MODELOB.pdf";
-                open_files(&fd1, &fd2, model_path, path, token, complete_exam_model);
-                cp_file(fd1, fd2);
-            }
-            else if (strcmp(exam_model, "C") == 0)
-            {
-                char complete_exam_model[] = "/MODELOC.pdf";
-                open_files(&fd1, &fd2, model_path, path, token, complete_exam_model);
-                cp_file(fd1, fd2);
-            }
-
-            break;
-        case 2:
-
-            int needed_mark;
-
-            char msg[] = "Mark you should obtain in this new exam to pass is:";
-
-            token = strtok(line, " ");
-            exam_model = strtok(NULL, " ");
-            mark = atoi(strtok(NULL, " "));
-            class_media += mark;
-            
-            child_counter++;
-            needed_mark = 2 * MIN_GRADE - mark;
-
-            strcpy(first_path, path);
-            strcat(first_path, token);
-
-            strcat(first_path, "/needed_mark.txt");
-
-            if ((f_mark = fopen(first_path, "w+")) == NULL)
-            {
-                fprintf(stderr, "Error creating file.\n");
-                exit(EXIT_FAILURE);
-            }
-
-            fprintf(f_mark, "%s %d", msg, needed_mark);
-            break;
+            fprintf(stderr, "Error opening file.\n");
+            exit(EXIT_FAILURE);
         }
+        break;
+    case 2:
+        fp = fopen(file_name, "w+");
+        if (fp == NULL)
+        {
+            fprintf(stderr, "Error opening file.\n");
+            exit(EXIT_FAILURE);
+        }
+        break;
     }
 
-    
-
-    fclose(fp);
-    close(fd1);
-    close(fd2);
-    fclose(f_mark);
+    return fp;
 }
 
 void open_files(int *fd1, int *fd2, char model_path[], char path[], char token[], char exam_model[])

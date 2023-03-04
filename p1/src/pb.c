@@ -9,19 +9,56 @@
 #include <fcntl.h>
 #include <time.h>
 #include <signal.h>
-#include "../include/my_lib.h"
+#include <my_lib.h>
 
 #define MAX_SIZE 100
 
 int main(int argc, char const *argv[])
 {
+    FILE *fp;
+
     char path[MAX_SIZE];
+    char line[MAX_SIZE];
+
+    char *token;
+    char *exam_model;
+
+    int fd1, fd2;
+    char model_path[] = "examModels/";
 
     parse_args(argc);
     strcpy(path, argv[2]);
-   
-    readFile(argv[0], atoi(argv[1]), path,1, NULL);
-    
-    // kill(getppid(), SIGUSR2);
-    return 0;
+
+    fp = open_single_file(argv[0],1);
+
+    while (fgets(line, sizeof(line), fp))
+    {
+
+       
+        token = strtok(line, " ");
+        exam_model = strtok(NULL, " ");
+
+        if (strcmp(exam_model, "A") == 0)
+        {
+            char complete_exam_model[] = "/MODELOA.pdf";
+            open_files(&fd1, &fd2, model_path, path, token, complete_exam_model);
+            cp_file(fd1, fd2);
+        }
+        else if (strcmp(exam_model, "B") == 0)
+        {
+            char complete_exam_model[] = "/MODELOB.pdf";
+            open_files(&fd1, &fd2, model_path, path, token, complete_exam_model);
+            cp_file(fd1, fd2);
+        }
+        else if (strcmp(exam_model, "C") == 0)
+        {
+            char complete_exam_model[] = "/MODELOC.pdf";
+            open_files(&fd1, &fd2, model_path, path, token, complete_exam_model);
+            cp_file(fd1, fd2);
+        }
+    }
+    close(fd1);
+    close(fd2);
+    fclose(fp);
+    return EXIT_SUCCESS;
 }
