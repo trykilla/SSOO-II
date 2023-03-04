@@ -1,3 +1,12 @@
+/************************************************************************************
+ * Project: Practise 1 - Operating Systems                                          *
+ * Program name: pb.c                                                               *
+ * Author: Héctor Alberca Sánchez-Quintanar                                         *
+ * Date: 20/02/2023                                                                 *
+ * Purpose: Copy exam models into students directories                              *
+ * Revision history: Héctor Alberca Sánchez-Quintanar, 20/02/2023                   *                                               *
+ ************************************************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

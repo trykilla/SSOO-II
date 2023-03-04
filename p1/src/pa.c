@@ -1,3 +1,12 @@
+/************************************************************************************
+ * Project: Practise 1 - Operating Systems                                          *
+ * Program name: pa.c                                                               *
+ * Author: Héctor Alberca Sánchez-Quintanar                                         *
+ * Date: 20/02/2023                                                                 *
+ * Purpose: Create directories for all the students                                 *
+ * Revision history: Héctor Alberca Sánchez-Quintanar, 20/02/2023                   *                                               *
+ ************************************************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

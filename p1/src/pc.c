@@ -1,3 +1,12 @@
+/************************************************************************************
+ * Project: Practise 1 - Operating Systems                                          *
+ * Program name: pc.c                                                               *
+ * Author: Héctor Alberca Sánchez-Quintanar                                         *
+ * Date: 20/02/2023                                                                 *
+ * Purpose: Calculates the media mark that one student need to pass the subject.    *
+ * Revision history: Héctor Alberca Sánchez-Quintanar, 20/02/2023                   *                                               *
+ ************************************************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -50,12 +59,8 @@ int main(int argc, char const *argv[])
         strcat(first_path, token);
 
         strcat(first_path, "/needed_mark.txt");
+        f_mark = open_single_file(first_path, 2);
 
-        if ((f_mark = fopen(first_path, "w+")) == NULL)
-        {
-            fprintf(stderr, "Error creating file.\n");
-            exit(EXIT_FAILURE);
-        }
 
         fprintf(f_mark, "%s %d", msg, needed_mark);
         // printf("%s %d\n", msg, needed_mark);

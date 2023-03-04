@@ -5,7 +5,7 @@
  * Date: 20/02/2023                                                                 *
  * Purpose: Process managing                                                        *
  * Revision history: Héctor Alberca Sánchez-Quintanar, 20/02/2023                   *
- * Create of process A and B                                                        *
+ * Create of process A, B, C, D                                                     *
  ************************************************************************************/
 
 #include <stdio.h>
@@ -22,6 +22,7 @@
 #include <my_lib.h>
 #include <def.h>
 
+
 #define CHILD_NUM 4
 #define MAX 100
 
@@ -32,16 +33,17 @@ void install_signal(void);
 void parse_args(int argc);
 
 pid_t g_pids[CHILD_NUM];
-struct TProcess_t *g_process_table;
+
 
 int main(int argc, char *argv[])
 {
+    
     int fd1[2];
     FILE *fp;
 
     char *args[] = {argv[1], argv[2], argv[3], NULL};
 
-    char buf[30];
+    char buf[MAX];
     char wr_fd[MAX];
 
     pipe(fd1);
@@ -52,20 +54,21 @@ int main(int argc, char *argv[])
 
     install_signal();
 
-    g_pids[0] = create_process("exec/pa", args);
+    g_pids[0] = create_process(PATH_A, args);
 
     waitpid(g_pids[0], NULL, 0);
     g_pids[0] = 0;
 
-    fp = open_single_file("files/log.txt", 2);
+    fp = open_single_file(FILES_PATH, 2);
+    
   
     fprintf(fp, "******** System Log ********\nDirectory creation finished.\n");
+    fflush(fp);
 
-    // printf("[MANAGER] Child process A finished, the execution continues...\n");
     sleep(1);
 
-    g_pids[1] = create_process("exec/pb", args);
-    g_pids[2] = create_process("exec/pc", pc_args);
+    g_pids[1] = create_process(PATH_B, args);
+    g_pids[2] = create_process(PATH_C, pc_args);
     
     waitpid(g_pids[1], NULL, 0);
     g_pids[1] = 0;
@@ -81,39 +84,16 @@ int main(int argc, char *argv[])
     fprintf(fp, "Files creation with mark necessary to reach media, finished.\n");
     fprintf(fp, "Media of the class: %s\nEND OF PROGRAM", buf);
 
-    // printf("[MANAGER] All child processes finished, the execution will be finished...\n");
-
+    
+    printf("\n[MANAGER] All child processes finished, the execution will be finished...\n");
     return EXIT_SUCCESS;
 }
 
-pid_t create_process(char path[], char *arg[])
-{
-    pid_t pid;
-    switch (pid = fork())
-    {
-    case -1:
-        fprintf(stderr, "[MANAGER] Error executing fork()\n");
-        end_process();
-        break;
 
-    case 0:
-
-        if (execv(path, arg) == -1)
-        {
-            fprintf(stderr, "[MANAGER] Error executing execv\n");
-            exit(EXIT_FAILURE);
-        }
-    }
-    return pid;
-}
 
 void install_signal()
 {
-    // if (signal(SIGUSR1, signal_handler) == SIG_ERR)
-    // {
-    //     fprintf(stderr, "[MANAGER] Error setting signal handler");
-    //     exit(EXIT_FAILURE);
-    // }
+
 
     if (signal(SIGINT, signal_handler) == SIG_ERR)
     {
@@ -125,10 +105,18 @@ void install_signal()
 void signal_handler(int sig)
 {
 
+
     if (sig == SIGINT)
     {
+        //Abre un fichero o crealo si no está creado y escribe [MANAGER] User has interrupted the execution of the program.\n"
         printf("[MANAGER] SIGINT signal received (CTRL + C), the execution will be finished...\n");
+        sleep(1);
         end_process();
+        FILE *fp = fopen(FILES_PATH, "w");
+        fprintf(fp,"******** System Log ********\n[MANAGER] User has interrupted the execution of the program.\n");
+        
+        create_process(PATH_D, NULL);
+        
         exit(EXIT_SUCCESS);
     }
 }

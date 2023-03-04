@@ -19,7 +19,16 @@ void cp_file(int fd1, int fd2);
 void open_files(int *fd1, int *fd2, char model_path[], char path[], char token[], char exam_model[]);
 // void open_files(int fd1, int fd2, char model_path[], char path[], char token[], char complete_exam_model[]);
 FILE *open_single_file(const char file_name[], int option);
+pid_t create_process(char path[], char *arg[]);
 
+/**
+ * Opens a file for reading or writing.
+ *
+ * @param file_name The name of the file to open.
+ * @param option 1 for reading, 2 for writing.
+ *
+ * @returns The file pointer.
+ */
 FILE *open_single_file(const char file_name[], int option)
 {
     FILE *fp;
@@ -30,7 +39,7 @@ FILE *open_single_file(const char file_name[], int option)
         fp = fopen(file_name, "r");
         if (fp == NULL)
         {
-            fprintf(stderr, "Error opening file.\n");
+            fprintf(stderr, "[READING] Error opening file.\n");
             exit(EXIT_FAILURE);
         }
         break;
@@ -38,7 +47,7 @@ FILE *open_single_file(const char file_name[], int option)
         fp = fopen(file_name, "w+");
         if (fp == NULL)
         {
-            fprintf(stderr, "Error opening file.\n");
+            fprintf(stderr, "[WRITING/CREATING] Error opening file.\n");
             exit(EXIT_FAILURE);
         }
         break;
@@ -47,6 +56,18 @@ FILE *open_single_file(const char file_name[], int option)
     return fp;
 }
 
+/**
+ * Opens the files for writing and reading.
+ *
+ * @param fd1 The file descriptor for the model.
+ * @param fd2 The file descriptor for the output.
+ * @param model_path The path to the model.
+ * @param path The path to the output file.
+ * @param token The token to append to the output file.
+ * @param exam_model The name of the model.
+ *
+ * @returns None
+ */
 void open_files(int *fd1, int *fd2, char model_path[], char path[], char token[], char exam_model[])
 {
 
@@ -73,6 +94,13 @@ void open_files(int *fd1, int *fd2, char model_path[], char path[], char token[]
     }
 }
 
+/**
+ * Parses the command line arguments.
+ *
+ * @param argc The number of command line arguments.
+ *
+ * @returns None
+ */
 void parse_args(int argc)
 {
     if (argc != 3)
@@ -82,6 +110,14 @@ void parse_args(int argc)
     }
 }
 
+/**
+ * Copies the contents of one file to another.
+ *
+ * @param fd1 The file descriptor for the source file.
+ * @param fd2 The file descriptor for the destination file.
+ *
+ * @returns None
+ */
 void cp_file(int fd1, int fd2)
 {
     char buffer[BUFFER_SIZE];
@@ -101,4 +137,33 @@ void cp_file(int fd1, int fd2)
         fprintf(stderr, "Error reading file.\n");
         exit(EXIT_FAILURE);
     }
+}
+
+/**
+ * Creates a new process and executes the given command.
+ *
+ * @param path The path to the executable file.
+ * @param arg The arguments to pass to the executable.
+ *
+ * @returns The process ID of the new process.
+ */
+pid_t create_process(char path[], char *arg[])
+{
+    pid_t pid;
+    switch (pid = fork())
+    {
+    case -1:
+        fprintf(stderr, "[MANAGER] Error executing fork()\n");
+        
+        break;
+
+    case 0:
+
+        if (execv(path, arg) == -1)
+        {
+            fprintf(stderr, "[MANAGER] Error executing execv\n");
+            exit(EXIT_FAILURE);
+        }
+    }
+    return pid;
 }
