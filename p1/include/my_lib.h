@@ -123,7 +123,7 @@ void cp_file(int fd1, int fd2)
     char buffer[BUFFER_SIZE];
     int read_bytes;
 
-    while ((if read_bytes = read(fd1, buffer, sizeof(buffer))) > 0)
+    while ((read_bytes = read(fd1, buffer, sizeof(buffer)))> 0)
     {
         if (write(fd2, buffer, read_bytes) != read_bytes)
         {

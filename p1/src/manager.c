@@ -28,7 +28,6 @@
 
 void signal_handler(int sig);
 void end_process(void);
-pid_t create_process(char path[], char *arg[]);
 void install_signal(void);
 void parse_args(int argc);
 
