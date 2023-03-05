@@ -1,3 +1,12 @@
+/************************************************************************************
+ * Project: Practise 1 - Operating Systems                                          *
+ * Program name: pd.c                                                               *
+ * Author: Héctor Alberca Sánchez-Quintanar                                         *
+ * Date: 05/02/2023                                                                 *
+ * Purpose: Remove every file related to Students                                   *
+ * Revision history: Héctor Alberca Sánchez-Quintanar, 20/02/2023                   *                                               *
+ ************************************************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,13 +24,26 @@
 
 void remove_files(const char *dir);
 
+/**
+ * The main function.
+ *
+ * @param argc The number of command line arguments.
+ * @param argv The command line arguments.
+ *
+ * @returns EXIT_SUCCESS if the program runs successfully.
+ */
 int main(int argc, char const *argv[])
 {
-    //elimina todos los archivos en el directorio students
+    // elimina todos los archivos en el directorio students
     remove_files(DIRE);
     return EXIT_SUCCESS;
 }
 
+/**
+ * Removes all files in the directory DIRE.
+ *
+ * @returns None
+ */
 void remove_files(const char *dir)
 {
 
@@ -38,7 +60,7 @@ void remove_files(const char *dir)
             continue;
         }
 
-        //Si un archivo se llama Students.txt no lo elimines
+        // Si un archivo se llama Students.txt no lo elimines
         if (strcmp(entry->d_name, "Students.txt") == 0)
         {
             continue;
@@ -59,13 +81,13 @@ void remove_files(const char *dir)
                 // Si es un archivo, elimínalo
                 if (remove(file_path) != 0)
                 {
-                    fprintf(stderr,"Couldn't remove file %s\n", file_path);
+                    fprintf(stderr, "Couldn't remove file %s\n", file_path);
                 }
             }
         }
         else
         {
-            fprintf(stderr,"Couldn't stat file %s\n", file_path);
+            fprintf(stderr, "Couldn't stat file %s\n", file_path);
         }
     }
 
@@ -76,7 +98,7 @@ void remove_files(const char *dir)
 
         if (rmdir(dir) != 0)
         {
-            fprintf(stderr,"Couldn't remove directory %s\n", dir);
+            fprintf(stderr, "Couldn't remove directory %s\n", dir);
         }
     }
 }
