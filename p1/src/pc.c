@@ -18,59 +18,71 @@
 #include <fcntl.h>
 #include <time.h>
 #include <my_lib.h>
+#include <def.h>
 
 #define MAX_SIZE 4096
+#define MARK_SIZE 10
+
+void parse_args_pc(int argc);
 
 int main(int argc, char const *argv[])
 {
-    FILE *fp;
+    /*Definimos las variables principales*/
+    FILE *p_student_fp;
     FILE *f_mark;
     char path[MAX_SIZE];
-    char *token;
-    
+    char *p_dni;
+
     int mark;
-    
+    int option = 1;
     float class_media = 0;
     float child_counter = 0;
 
-    // parse_args(argc);
+    /*Comprobamos los parámetros*/
+    parse_args_pc(argc);
     strcpy(path, argv[2]);
 
-    // readFile(argv[0], atoi(argv[1]), path, 2, argv[3]);
-
     char line[MAX_SIZE];
-    fp  = open_single_file(argv[0],1);
+    p_student_fp = open_single_file(argv[0], option);
 
-    while (fgets(line, sizeof(line), fp))
+    while (fgets(line, sizeof(line), p_student_fp))
     {
         int needed_mark;
-
-        char msg[] = "Mark you should obtain in this new exam to pass is:";
-        char first_path[PATH_SIZE];
-        token = strtok(line, " ");
+        /*Obtenemos el parámetro que necesitamos, la nota */
+        char msg[] = PC_MSG;
+        char tmp_path[PATH_SIZE];
+        p_dni = strtok(line, " ");
         strtok(NULL, " ");
         mark = atoi(strtok(NULL, " "));
         class_media += mark;
-
+        /*Calculamos las medias y contamos los estudiantes*/
         child_counter++;
         needed_mark = 2 * MIN_GRADE - mark;
 
-        strcpy(first_path, path);
-        strcat(first_path, token);
+        strcpy(tmp_path, path);
+        strcat(tmp_path, p_dni);
 
-        strcat(first_path, "/needed_mark.txt");
-        f_mark = open_single_file(first_path, 2);
-
+        strcat(tmp_path, NEED_MARK);
+        f_mark = open_single_file(tmp_path, 2);
 
         fprintf(f_mark, "%s %d", msg, needed_mark);
-        // printf("%s %d\n", msg, needed_mark);
     }
 
+    /*Calculamos la media de la clase y convertimos mediante gcvt*/
     class_media = class_media / child_counter;
-    char class_media_char[10];
+    char class_media_char[MARK_SIZE];
     gcvt(class_media, sizeof(class_media_char), class_media_char);
     write(atoi(argv[3]), class_media_char, sizeof(class_media_char));
 
-    fclose(fp);
-    return 0;
+    fclose(p_student_fp);
+    return EXIT_SUCCESS;
+}
+
+void parse_args_pc(int argc)
+{
+    if (argc != 4)
+    {
+        fprintf(stderr, "Usage:<file> <path> <pipe>\n");
+        exit(EXIT_FAILURE);
+    }
 }

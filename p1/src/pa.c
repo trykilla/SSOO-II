@@ -25,28 +25,29 @@
 int main(int argc, char const *argv[])
 {
 
-    FILE *fp;
+    /*Definimos las variables principales*/
+    FILE *p_student_fp;
+    char *p_dni;
     char path[MAX_SIZE];
     char line[MAX_SIZE];
+    int option = 1;
 
-    char *token;
-
+    /*Comprobamos que el número de argumentos es correcto*/
     parse_args(argc);
+    /*Almacenamos el contenido de la línea de comandos en el path*/
     strcpy(path, argv[2]);
-    printf("%s", argv[0]);
+    p_student_fp = open_single_file(argv[0],option);
 
-    fp = open_single_file(argv[0],1);
-
-    
-    while (fgets(line, sizeof(line), fp))
+    /*Manipulamos el fichero, registrando el dni y creando las carpetas.*/
+    while (fgets(line, sizeof(line), p_student_fp))
     {
 
-        token = strtok(line, " ");
-        char first_path[PATH_SIZE];
-        strcpy(first_path, path);
-        strcat(first_path, token);
-        mkdir(first_path, 0777);
+        p_dni = strtok(line, " ");
+        char tmp_path[PATH_SIZE];
+        strcpy(tmp_path, path);
+        strcat(tmp_path, p_dni);
+        mkdir(tmp_path, 0777);
     }
-    fclose(fp);
+    fclose(p_student_fp);
     return EXIT_SUCCESS;
 }

@@ -28,6 +28,8 @@ void cp_dir(char *src, char *dst);
 
 #define SRC "../p1"
 #define DST "../practice_backup"
+#define BUFF_SIZE 1024
+#define ALARM_TIME 60
 
 /**
  * The main function for the backup process.
@@ -45,7 +47,7 @@ int main(int argc, char const *argv[])
     sigaction(SIGALRM, &act, NULL);
 
     printf("[BACKUP] STARTING BACKUP PROCESS\nTO FINISH PROCESS, KILL IT WITH (KILL -9)\n");
-    alarm(60);
+    alarm(ALARM_TIME);
     while (1);
 
     return EXIT_SUCCESS;
@@ -66,7 +68,7 @@ void handler(int signum)
     char *dst = DST;
     cp_dir(src, dst);
 
-    alarm(60);
+    alarm(ALARM_TIME);
 }
 
 /**
@@ -80,20 +82,20 @@ void handler(int signum)
 void cp_file(char *src, char *dst)
 {
     int fd_src, fd_dst;
-    char buf[1024];
+    char buf[BUFF_SIZE];
     ssize_t bytes_read;
 
     fd_src = open(src, O_RDONLY);
     if (fd_src == -1)
     {
-        perror("[BACKUP] Error opening src file");
+        fprintf(stderr,"[BACKUP] Error opening src file");
         exit(EXIT_FAILURE);
     }
 
     fd_dst = open(dst, O_WRONLY | O_CREAT | O_TRUNC, 0777);
     if (fd_dst == -1)
     {
-        perror("[BACKUP] Error opening dst file");
+        fprintf(stderr,"[BACKUP] Error opening dst file");
         exit(EXIT_FAILURE);
     }
 
@@ -101,26 +103,26 @@ void cp_file(char *src, char *dst)
     {
         if (write(fd_dst, buf, bytes_read) != bytes_read)
         {
-            perror("[BACKUP] Error writing to dst file");
+            fprintf(stderr,"[BACKUP] Error writing to dst file");
             exit(EXIT_FAILURE);
         }
     }
 
     if (bytes_read == -1)
     {
-        perror("[BACKUP] Error reading from src file");
+        fprintf(stderr,"[BACKUP] Error reading from src file");
         exit(EXIT_FAILURE);
     }
 
     if (close(fd_src) == -1)
     {
-        perror("[BACKUP] Error closing src file");
+        fprintf(stderr,"[BACKUP] Error closing src file");
         exit(EXIT_FAILURE);
     }
 
     if (close(fd_dst) == -1)
     {
-        perror("[BACKUP] Error closing dst file");
+        fprintf(stder,,"[BACKUP] Error closing dst file");
         exit(EXIT_FAILURE);
     }
 }
@@ -135,28 +137,28 @@ void cp_file(char *src, char *dst)
  */
 void cp_dir(char *src, char *dst)
 {
-    DIR *dir;
+    DIR *p_directory;
     struct dirent *entry;
     struct stat st;
-    char src_path[1024], dst_path[1024];
+    char src_path[BUFF_SIZE], dst_path[BUFF_SIZE];
 
     // Crear directorio de destino si no existe
     if (mkdir(dst, 0777) == -1 && errno != EEXIST)
     {
-        perror("[BACKUP] Could not create dst directory");
+        fprintf(stderr,"[BACKUP] Could not create dst directory");
         exit(EXIT_FAILURE);
     }
 
     // Abrir directorio de origen
-    dir = opendir(src);
-    if (!dir)
+    p_directory = opendir(src);
+    if (!p_directory)
     {
-        perror("[BACKUP] Could not open src directory");
+        fprintf(stderr,"[BACKUP] Could not open src directory");
         exit(EXIT_FAILURE);
     }
 
     // Copiar cada entrada en el directorio
-    while ((entry = readdir(dir)))
+    while ((entry = readdir(p_directory)))
     {
         if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
         {
@@ -169,7 +171,7 @@ void cp_dir(char *src, char *dst)
         // Obtener información de archivo/directorio
         if (lstat(src_path, &st) == -1)
         {
-            perror("[BACKUP] Error getting file info");
+            fprintf(stderr,"[BACKUP] Error getting file info");
             exit(EXIT_FAILURE);
         }
 
@@ -187,9 +189,9 @@ void cp_dir(char *src, char *dst)
     }
 
     // Cerrar directorio
-    if (closedir(dir) == -1)
+    if (closedir(p_directory) == -1)
     {
-        perror("[BACKUP] Error closing src directory");
+        fprintf(stderr,"[BACKUP] Error closing src directory");
         exit(EXIT_FAILURE);
     }
 }

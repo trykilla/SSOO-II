@@ -7,10 +7,9 @@ CFLAGS := -I$(DIRHEA) -c -Wall
 LDLIBS := -lpthread -lrt
 CC := gcc
 
-all : dirs manager pa pb pc pd
+all : dirs manager pa pb pc pd backup
 
-clean_students: #borrar la carpeta de los estudiantes
-	find students/ -mindepth 1 ! -name 'Students.txt' -delete
+
 
 dirs:
 	mkdir -p $(DIROBJ) $(DIREXE)
@@ -30,16 +29,20 @@ pc: $(DIROBJ)pc.o
 pd: $(DIROBJ)pd.o
 	$(CC) -o $(DIREXE)$@ $^ $(LDLIBS) 
 
+backup: $(DIROBJ)backup.o
+	$(CC) -o $(DIREXE)$@ $^ $(LDLIBS)
+
 $(DIROBJ)%.o: $(DIRSRC)%.c
 	$(CC) $(CFLAGS) $^ -o $@
 
 test:
 	./$(DIREXE)manager students/Students.txt 1000 students/
 
-solution:
-	./$(DIREXE)manager 2 3 4
 
 clean : 
 	rm -rf *~ core $(DIROBJ) $(DIREXE) 
+
+clean_students: #borrar la carpeta de los estudiantes
+	find students/ -mindepth 1 ! -name 'Students.txt' -delete
 
 clean_all: clean clean_students

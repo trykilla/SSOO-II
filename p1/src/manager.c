@@ -22,7 +22,6 @@
 #include <my_lib.h>
 #include <def.h>
 
-
 #define CHILD_NUM 4
 #define MAX 100
 
@@ -33,66 +32,67 @@ void parse_args(int argc);
 
 pid_t g_pids[CHILD_NUM];
 
-
 int main(int argc, char *argv[])
 {
-    
-    int fd1[2];
-    FILE *fp;
 
-    char *args[] = {argv[1], argv[2], argv[3], NULL};
+    /*Defino las variables principales del programa (pipes, descriptores...)*/
+    int pc_pipe[2];
+    FILE *log_fp;
 
-    char buf[MAX];
-    char wr_fd[MAX];
+    char pipe_buf[MAX];
+    char write_pipe[MAX];
 
-    pipe(fd1);
+    pipe(pc_pipe);
+    sprintf(write_pipe, "%d", pc_pipe[1]);
 
-    sprintf(wr_fd, "%d", fd1[1]);
-
-    char *pc_args[] = {argv[1], argv[2], argv[3], wr_fd, NULL};
+    /*Defino e inicializo los argumentos que pasaremos al crear procesos*/
+    char *p_args[] = {argv[1], argv[2], argv[3], NULL};
+    char *pc_args[] = {argv[1], argv[2], argv[3], write_pipe, NULL};
 
     install_signal();
 
-    g_pids[0] = create_process(PATH_A, args);
+    /*Creo los procesos*/
+    g_pids[0] = create_process(PATH_A, p_args);
 
     waitpid(g_pids[0], NULL, 0);
     g_pids[0] = 0;
 
-    fp = open_single_file(FILES_PATH, 2);
-    
-  
-    fprintf(fp, "******** System Log ********\nDirectory creation finished.\n");
-    fflush(fp);
+    log_fp = open_single_file(FILES_PATH, 2);
+
+    fprintf(log_fp, "******** System Log ********\nDirectory creation finished.\n");
+    fflush(log_fp);
 
     sleep(1);
 
-    g_pids[1] = create_process(PATH_B, args);
+    g_pids[1] = create_process(PATH_B, p_args);
     g_pids[2] = create_process(PATH_C, pc_args);
-    
+
     waitpid(g_pids[1], NULL, 0);
     g_pids[1] = 0;
-    fprintf(fp, "Exam models copy finished.\n");
+    fprintf(log_fp, "Exam models copy finished.\n");
 
-    // leeme de la tubería que le pasé al hijo:
-    // vamos a cerrar la parte de la tubería que no vamos a usar
-    close(fd1[1]);
-    read(fd1[0], buf, sizeof(buf));
+    /*Cierro el descriptor de escritura del pipe porque solo voy a leer*/
+    close(pc_pipe[1]);
+    read(pc_pipe[0], pipe_buf, sizeof(pipe_buf));
 
     waitpid(g_pids[2], NULL, 0);
     g_pids[2] = 0;
-    fprintf(fp, "Files creation with mark necessary to reach media, finished.\n");
-    fprintf(fp, "Media of the class: %s\nEND OF PROGRAM", buf);
+    fprintf(log_fp, "Files creation with mark necessary to reach media, finished.\n");
+    fprintf(log_fp, "Media of the class: %s\nEND OF PROGRAM", pipe_buf);
 
-    
     printf("\n[MANAGER] All child processes finished, the execution will be finished...\n");
     return EXIT_SUCCESS;
 }
 
 
 
+/**
+ * Handles the SIGINT signal.
+ *
+ * @returns None
+ */
 void install_signal()
 {
-
 
     if (signal(SIGINT, signal_handler) == SIG_ERR)
     {
@@ -101,27 +101,40 @@ void install_signal()
     }
 }
 
+/**
+ * Handles the SIGINT signal.
+ *
+ * @param sig The signal number.
+ *
+ * @returns None
+ */
 void signal_handler(int sig)
 {
 
-
     if (sig == SIGINT)
     {
-        //Abre un fichero o crealo si no está creado y escribe [MANAGER] User has interrupted the execution of the program.\n"
+        // Abre un fichero o creálo si no está creado 
         printf("[MANAGER] SIGINT signal received (CTRL + C), the execution will be finished...\n");
         sleep(1);
         end_process();
-        FILE *fp = fopen(FILES_PATH, "w");
-        fprintf(fp,"******** System Log ********\n[MANAGER] User has interrupted the execution of the program.\n");
-        
+        FILE *log_fp = fopen(FILES_PATH, "w");
+        fprintf(log_fp, "******** System Log ********\n[MANAGER] User has interrupted the execution of the program.\n");
+
         create_process(PATH_D, NULL);
-        
+
         exit(EXIT_SUCCESS);
     }
 }
 
+/**
+ * Kills all child processes.
+ *
+ * @returns None
+ */
 void end_process(void)
 {
+
+    /*Comprobamos si hay procesos inicializados, si es así, los matamos.*/
     int i;
     for (i = 0; i < CHILD_NUM; i++)
     {
