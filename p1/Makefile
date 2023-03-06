@@ -9,8 +9,6 @@ CC := gcc
 
 all : dirs manager pa pb pc pd backup
 
-
-
 dirs:
 	mkdir -p $(DIROBJ) $(DIREXE)
 
